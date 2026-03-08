@@ -1,54 +1,20 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+import Dashboard from "./components/Dashboard";
+import StudentList from "./components/StudentList";
+import EnrollForm from "./components/EnrollForm";
 
 function App() {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("http://localhost:5000/api/students")
-      .then((res) => res.json())
-      .then((data) => {
-        setStudents(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
-
   return (
-    <div className="App">
-      <h1>University Database</h1>
-      <h2>Students</h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <table border="1" cellPadding="10">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Email</th>
-              <th>GPA</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student) => (
-              <tr key={student.StudentID}>
-                <td>{student.StudentID}</td>
-                <td>{student.FirstName}</td>
-                <td>{student.LastName}</td>
-                <td>{student.Email}</td>
-                <td>{student.GPA}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="students" element={<StudentList />} />
+          <Route path="enroll" element={<EnrollForm />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
