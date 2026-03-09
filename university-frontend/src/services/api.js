@@ -14,4 +14,8 @@ export const enrollStudent = (studentId, sectionId) =>
   API.post("/enroll", { studentId, sectionId });
 export const checkPrerequisites = (studentId, courseId) =>
   API.post("/enroll/check-prerequisites", { studentId, courseId });
+export const getStudentProfile = (id) => API.get(`/students/${id}/profile`);
+export const getDepartmentGPA = () => API.get("/analytics/department-gpa");
+export const getProgramEnrollment = () =>
+  API.get("/analytics/program-enrollment");
 // Add more as needed

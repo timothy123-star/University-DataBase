@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom"; // 👈 import Link
 import { getStudents } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const StudentList = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getStudents()
@@ -52,12 +56,26 @@ const StudentList = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {students.map((student) => (
-              <tr key={student.StudentID} className="hover:bg-gray-50">
+              <tr
+                key={student.StudentID}
+                className="hover:bg-gray-100 cursor-pointer transition-colors"
+                onClick={() => {
+                  // Navigate programmatically (alternative to Link)
+                  // window.location.href = `/students/${student.StudentID}`;
+                  navigate(`/students/${student.StudentID}`);
+                }}
+              >
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {student.StudentID}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {student.FirstName} {student.LastName}
+                  {/* You can also wrap just the name in a Link if you prefer */}
+                  <Link
+                    to={`/students/${student.StudentID}`}
+                    className="text-indigo-600 hover:underline"
+                  >
+                    {student.FirstName} {student.LastName}
+                  </Link>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {student.Email}

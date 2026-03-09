@@ -350,6 +350,94 @@ app.get("/api/programs", async (req, res) => {
   }
 });
 
+// GET /api/students/:id/profile - returns student details + enrollments
+app.get("/api/students/:id/profile", async (req, res) => {
+  try {
+    const studentId = req.params.id;
+
+    // 1. Get student personal info
+    const [studentRows] = await db.query(
+      "SELECT StudentID, FirstName, LastName, Email, GPA FROM Student WHERE StudentID = ?",
+      [studentId],
+    );
+    if (studentRows.length === 0) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+    const student = studentRows[0];
+
+    // 2. Get enrollments with course and section details
+    const [enrollments] = await db.query(
+      `SELECT 
+         e.EnrollmentID,
+         e.Grade,
+         e.EnrollmentStatus,
+         c.CourseCode,
+         c.CourseName,
+         c.CreditHours,
+         s.SectionNumber,
+         t.TermName,
+         CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName
+       FROM Enrollment e
+       JOIN Section s ON e.SectionID = s.SectionID
+       JOIN Course c ON s.CourseID = c.CourseID
+       JOIN Term t ON s.TermID = t.TermID
+       JOIN Faculty f ON s.InstructorID = f.FacultyID
+       WHERE e.StudentID = ?
+       ORDER BY t.StartDate DESC, c.CourseCode`,
+      [studentId],
+    );
+
+    // 3. Combine and send
+    res.json({
+      student,
+      enrollments,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/analytics/department-gpa - returns average GPA per department
+app.get("/api/analytics/department-gpa", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        d.DepartmentName,
+        AVG(s.GPA) AS AvgGPA,
+        COUNT(s.StudentID) AS StudentCount
+      FROM Department d
+      LEFT JOIN Program p ON d.DepartmentID = p.DepartmentID
+      LEFT JOIN Student s ON s.MajorID = p.ProgramID
+      GROUP BY d.DepartmentID
+      ORDER BY AvgGPA DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/analytics/program-enrollment - students per program
+app.get("/api/analytics/program-enrollment", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        p.ProgramName,
+        COUNT(s.StudentID) AS StudentCount
+      FROM Program p
+      LEFT JOIN Student s ON p.ProgramID = s.MajorID
+      GROUP BY p.ProgramID
+      ORDER BY StudentCount DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

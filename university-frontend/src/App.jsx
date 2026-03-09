@@ -3,6 +3,8 @@ import Layout from "./components/Layout";
 import Dashboard from "./components/Dashboard";
 import StudentList from "./components/StudentList";
 import EnrollForm from "./components/EnrollForm";
+import StudentProfile from "./components/StudentProfile";
+import AnalyticsDashboard from "./components/AnalyticsDashboard";
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
           <Route path="students" element={<StudentList />} />
           <Route path="enroll" element={<EnrollForm />} />
         </Route>
+        <Route path="/students/:id" element={<StudentProfile />} />
+        <Route path="/analytics" element={<AnalyticsDashboard />} />
       </Routes>
     </BrowserRouter>
   );
