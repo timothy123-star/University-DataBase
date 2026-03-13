@@ -114,11 +114,12 @@ app.get("/api/students/:id", async (req, res) => {
 
 // Add new student
 app.post("/api/students", async (req, res) => {
-  const { FirstName, LastName, Email, EnrollmentDate, MajorID, AdvisorID } =
-    req.body;
   try {
+    const { FirstName, LastName, Email, EnrollmentDate, MajorID, AdvisorID } =
+      req.body;
     const [result] = await db.query(
-      "INSERT INTO Student (FirstName, LastName, Email, EnrollmentDate, MajorID, AdvisorID) VALUES (?, ?, ?, ?, ?, ?)",
+      `INSERT INTO Student (FirstName, LastName, Email, EnrollmentDate, MajorID, AdvisorID, GPA)
+       VALUES (?, ?, ?, ?, ?, ?, 0.00)`,
       [
         FirstName,
         LastName,
@@ -130,11 +131,13 @@ app.post("/api/students", async (req, res) => {
     );
     res.status(201).json({ StudentID: result.insertId, ...req.body });
   } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({ error: "Email already exists" });
+    }
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
-
 // Get all courses
 app.get("/api/courses", async (req, res) => {
   try {
@@ -432,6 +435,96 @@ app.get("/api/analytics/program-enrollment", async (req, res) => {
       ORDER BY StudentCount DESC
     `);
     res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/students/:studentId/eligible-sections
+app.get("/api/students/:studentId/eligible-sections", async (req, res) => {
+  try {
+    const studentId = req.params.studentId;
+
+    // 1. Get all sections with details
+    const [allSections] = await db.query(`
+      SELECT 
+        s.SectionID,
+        s.SectionNumber,
+        s.Capacity,
+        s.EnrolledCount,
+        c.CourseID,
+        c.CourseCode,
+        c.CourseName,
+        c.CreditHours,
+        t.TermID,
+        t.TermName,
+        CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName,
+        r.RoomNumber,
+        r.Building,
+        s.Schedule
+      FROM Section s
+      JOIN Course c ON s.CourseID = c.CourseID
+      JOIN Term t ON s.TermID = t.TermID
+      JOIN Faculty f ON s.InstructorID = f.FacultyID
+      LEFT JOIN Room r ON s.RoomID = r.RoomID
+      WHERE t.EndDate >= CURDATE()  -- only current/future terms
+    `);
+
+    // 2. Get student's completed courses (with grade A, B, C)
+    const [completedCourses] = await db.query(
+      `
+      SELECT DISTINCT c.CourseID
+      FROM Enrollment e
+      JOIN Section s ON e.SectionID = s.SectionID
+      JOIN Course c ON s.CourseID = c.CourseID
+      WHERE e.StudentID = ? AND e.Grade IN ('A','B','C')
+    `,
+      [studentId],
+    );
+    const completedIds = completedCourses.map((row) => row.CourseID);
+
+    // 3. Get student's current enrollments (to exclude)
+    const [enrolledSections] = await db.query(
+      "SELECT SectionID FROM Enrollment WHERE StudentID = ?",
+      [studentId],
+    );
+    const enrolledSectionIds = enrolledSections.map((row) => row.SectionID);
+
+    // 4. For each section, check prerequisites and availability
+    const eligibleSections = [];
+
+    for (const sec of allSections) {
+      // Skip if already enrolled
+      if (enrolledSectionIds.includes(sec.SectionID)) continue;
+
+      // Skip if no seats
+      if (sec.EnrolledCount >= sec.Capacity) continue;
+
+      // Check prerequisites
+      const [prereqs] = await db.query(
+        "SELECT PrerequisiteCourseID FROM Prerequisite WHERE CourseID = ?",
+        [sec.CourseID],
+      );
+      const prereqIds = prereqs.map((p) => p.PrerequisiteCourseID);
+
+      // If there are prerequisites, all must be in completedIds
+      const missingPrereqs = prereqIds.filter(
+        (pid) => !completedIds.includes(pid),
+      );
+      if (missingPrereqs.length > 0) {
+        // Optionally store missing names for display
+        continue; // skip this section
+      }
+
+      // All checks passed – include this section
+      eligibleSections.push({
+        ...sec,
+        AvailableSeats: sec.Capacity - sec.EnrolledCount,
+      });
+    }
+
+    res.json(eligibleSections);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

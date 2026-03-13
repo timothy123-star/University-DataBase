@@ -18,4 +18,11 @@ export const getStudentProfile = (id) => API.get(`/students/${id}/profile`);
 export const getDepartmentGPA = () => API.get("/analytics/department-gpa");
 export const getProgramEnrollment = () =>
   API.get("/analytics/program-enrollment");
+
+export const getEligibleSections = (studentId) =>
+  API.get(`/students/${studentId}/eligible-sections`);
 // Add more as needed
+
+export const getPrograms = () => API.get("/programs");
+export const getFaculty = () => API.get("/faculty");
+export const registerStudent = (data) => API.post("/students", data);

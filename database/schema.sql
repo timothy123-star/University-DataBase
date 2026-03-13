@@ -63,10 +63,10 @@ CREATE TABLE Course (
     FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
 );
 
--- 6. Term
-CREATE TABLE Term (
-    TermID INT PRIMARY KEY AUTO_INCREMENT,
-    TermName VARCHAR(50) NOT NULL,
+-- 6. Semester
+CREATE TABLE Semester (
+    SemesterID INT PRIMARY KEY AUTO_INCREMENT,
+    SemesterName VARCHAR(50) NOT NULL,
     StartDate DATE NOT NULL,
     EndDate DATE NOT NULL
 );
@@ -83,7 +83,7 @@ CREATE TABLE Room (
 CREATE TABLE Section (
     SectionID INT PRIMARY KEY AUTO_INCREMENT,
     CourseID INT NOT NULL,
-    TermID INT NOT NULL,
+    SemesterID INT NOT NULL,
     InstructorID INT NOT NULL,
     SectionNumber VARCHAR(10) NOT NULL,
     Schedule VARCHAR(100),
@@ -91,10 +91,10 @@ CREATE TABLE Section (
     Capacity INT NOT NULL,
     EnrolledCount INT DEFAULT 0,
     FOREIGN KEY (CourseID) REFERENCES Course(CourseID),
-    FOREIGN KEY (TermID) REFERENCES Term(TermID),
+    FOREIGN KEY (SemesterID) REFERENCES Semester(SemesterID),
     FOREIGN KEY (InstructorID) REFERENCES Faculty(FacultyID),
     FOREIGN KEY (RoomID) REFERENCES Room(RoomID),
-    UNIQUE KEY unique_section (CourseID, TermID, SectionNumber)
+    UNIQUE KEY unique_section (CourseID, SemesterID, SectionNumber)
 );
 
 -- 9. Enrollment
@@ -123,7 +123,7 @@ CREATE TABLE Prerequisite (
 CREATE INDEX idx_student_email ON Student(Email);
 CREATE INDEX idx_enrollment_student ON Enrollment(StudentID);
 CREATE INDEX idx_enrollment_section ON Enrollment(SectionID);
-CREATE INDEX idx_section_term ON Section(TermID);
+CREATE INDEX idx_section_semester ON Section(SemesterID);
 
 -- Optional: Trigger for GPA update (simplified example)
 DELIMITER //
