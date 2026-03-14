@@ -13,12 +13,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
-          <Route path="/students" element={<StudentList />} />
-          <Route path="/enroll-enhanced" element={<EnhancedEnrollment />} />
+          <Route path="students" element={<StudentList />} />
+          <Route path="students/:id" element={<StudentProfile />} />
+          <Route path="enroll-enhanced" element={<EnhancedEnrollment />} />
+          <Route path="analytics" element={<AnalyticsDashboard />} />
+          <Route path="register" element={<StudentRegistration />} />
         </Route>
-        <Route path="/students/:id" element={<StudentProfile />} />
-        <Route path="/analytics" element={<AnalyticsDashboard />} />
-        <Route path="/register" element={<StudentRegistration />} />
       </Routes>
     </BrowserRouter>
   );
