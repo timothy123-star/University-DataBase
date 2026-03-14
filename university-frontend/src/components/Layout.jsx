@@ -1,45 +1,65 @@
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 
 const Layout = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       <aside className="w-64 bg-indigo-800 text-white p-6">
-        <h1 className="text-2xl font-bold mb-8">UniDB</h1>
+        <h1 className="text-2xl font-bold mb-8">Enhanced Uni DB</h1>
         <nav className="space-y-2">
-          <Link
+          <NavLink
             to="/"
-            className="block px-4 py-2 rounded hover:bg-indigo-700 transition"
+            className={({ isActive }) =>
+              `block px-4 py-2 rounded transition ${
+                isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+              }`
+            }
           >
             Dashboard
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/students"
-            className="block px-4 py-2 rounded hover:bg-indigo-700 transition"
+            className={({ isActive }) =>
+              `block px-4 py-2 rounded transition ${
+                isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+              }`
+            }
           >
             Students
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/register"
-            className="block px-4 py-2 rounded hover:bg-indigo-700 transition"
+            className={({ isActive }) =>
+              `block px-4 py-2 rounded transition ${
+                isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+              }`
+            }
           >
             Register
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/enroll-enhanced"
-            className="block px-4 py-2 rounded hover:bg-indigo-700 transition"
+            className={({ isActive }) =>
+              `block px-4 py-2 rounded transition ${
+                isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+              }`
+            }
           >
             Smart Enrollment
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/analytics"
-            className="block px-4 py-2 rounded hover:bg-indigo-700 transition"
+            className={({ isActive }) =>
+              `block px-4 py-2 rounded transition ${
+                isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+              }`
+            }
           >
-            View Analytics
-          </Link>{" "}
+            Analytics
+          </NavLink>
         </nav>
       </aside>
       <main className="flex-1 overflow-y-auto p-8">
-        <Outlet />
+        <Outlet /> {/* This renders the matched child route */}
       </main>
     </div>
   );
