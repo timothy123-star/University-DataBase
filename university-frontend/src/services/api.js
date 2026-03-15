@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api", // your backend URL
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api", // fallback for local dev only
 });
 
 export const getStudents = () => API.get("/students");
@@ -26,3 +26,5 @@ export const getEligibleSections = (studentId) =>
 export const getPrograms = () => API.get("/programs");
 export const getFaculty = () => API.get("/faculty");
 export const registerStudent = (data) => API.post("/students", data);
+
+export default API;
