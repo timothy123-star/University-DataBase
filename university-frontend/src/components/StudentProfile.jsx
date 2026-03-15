@@ -54,7 +54,7 @@ const StudentProfile = () => {
       </div>
 
       {/* Enrollments Table */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">
           Enrollments
         </h3>

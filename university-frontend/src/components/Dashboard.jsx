@@ -36,7 +36,7 @@ const Dashboard = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">

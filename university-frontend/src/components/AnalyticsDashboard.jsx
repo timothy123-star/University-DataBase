@@ -30,11 +30,11 @@ const AnalyticsDashboard = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Average GPA per Department */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow overflow-x-auto">
           <h3 className="text-lg font-semibold mb-4">
             Average GPA by Department
           </h3>
-          <table className="min-w-full">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="border-b">
                 <th className="text-left py-2">Department</th>
