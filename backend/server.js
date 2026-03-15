@@ -4,7 +4,11 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL, // set this on Render as your Vercel frontend URL
+];
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
 // Create MySQL connection pool
