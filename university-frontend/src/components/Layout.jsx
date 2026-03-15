@@ -107,7 +107,7 @@ const Layout = () => {
               />
             </svg>
           </button>
-          <h2 className="text-xl font-semibold ml-2">UniDB</h2>
+          <h2 className="text-xl font-semibold ml-2">Enhanced Univ DB</h2>
         </div>
 
         <Outlet />
