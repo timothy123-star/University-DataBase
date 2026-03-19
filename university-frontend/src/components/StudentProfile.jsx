@@ -88,7 +88,7 @@ const StudentProfile = () => {
                     {e.CourseCode}: {e.CourseName}
                   </td>
                   <td className="px-4 py-2">{e.SectionNumber}</td>
-                  <td className="px-4 py-2">{e.TermName}</td>
+                  <td className="px-4 py-2">{e.SemesterName}</td>
                   <td className="px-4 py-2">{e.InstructorName}</td>
                   <td className="px-4 py-2">
                     <span

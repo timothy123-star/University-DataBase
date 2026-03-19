@@ -246,18 +246,18 @@ app.get("/api/courses/:id", async (req, res) => {
 
 // ==================== SECTIONS ====================
 
-// Get all sections (with course, term, instructor details)
+// Get all sections (with course, Semester, instructor details)
 app.get("/api/sections", async (req, res) => {
   try {
     const [rows] = await db.query(`
       SELECT s.*, 
              c.CourseCode, c.CourseName,
-             t.TermName,
+             t.SemesterName,
              CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName,
              r.RoomNumber, r.Building
       FROM Section s
       JOIN Course c ON s.CourseID = c.CourseID
-      JOIN Term t ON s.TermID = t.TermID
+      JOIN Semester t ON s.SemesterID = t.SemesterID
       JOIN Faculty f ON s.InstructorID = f.FacultyID
       LEFT JOIN Room r ON s.RoomID = r.RoomID
     `);
@@ -268,26 +268,26 @@ app.get("/api/sections", async (req, res) => {
   }
 });
 
-// Get sections for a specific course in a term
+// Get sections for a specific course in a Semester
 app.get("/api/courses/:courseId/sections", async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { termId } = req.query; // optional term filter
+    const { SemesterId } = req.query; // optional Semester filter
     let query = `
       SELECT s.*, 
-             t.TermName,
+             t.SemesterName,
              CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName,
              r.RoomNumber, r.Building
       FROM Section s
-      JOIN Term t ON s.TermID = t.TermID
+      JOIN Semester t ON s.SemesterID = t.SemesterID
       JOIN Faculty f ON s.InstructorID = f.FacultyID
       LEFT JOIN Room r ON s.RoomID = r.RoomID
       WHERE s.CourseID = ?
     `;
     const params = [courseId];
-    if (termId) {
-      query += " AND s.TermID = ?";
-      params.push(termId);
+    if (SemesterId) {
+      query += " AND s.SemesterID = ?";
+      params.push(SemesterId);
     }
     const [rows] = await db.query(query, params);
     res.json(rows);
@@ -308,12 +308,12 @@ app.get("/api/students/:studentId/enrollments", async (req, res) => {
       SELECT e.*, 
              s.SectionNumber,
              c.CourseCode, c.CourseName,
-             t.TermName,
+             t.SemesterName,
              CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName
       FROM Enrollment e
       JOIN Section sec ON e.SectionID = sec.SectionID
       JOIN Course c ON sec.CourseID = c.CourseID
-      JOIN Term t ON sec.TermID = t.TermID
+      JOIN Semester t ON sec.SemesterID = t.SemesterID
       JOIN Faculty f ON sec.InstructorID = f.FacultyID
       WHERE e.StudentID = ?
       ORDER BY t.StartDate DESC
@@ -386,12 +386,12 @@ app.get("/api/students/:id/profile", async (req, res) => {
          c.CourseName,
          c.CreditHours,
          s.SectionNumber,
-         t.TermName,
+         t.SemesterName,
          CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName
        FROM Enrollment e
        JOIN Section s ON e.SectionID = s.SectionID
        JOIN Course c ON s.CourseID = c.CourseID
-       JOIN Term t ON s.TermID = t.TermID
+       JOIN Semester t ON s.SemesterID = t.SemesterID
        JOIN Faculty f ON s.InstructorID = f.FacultyID
        WHERE e.StudentID = ?
        ORDER BY t.StartDate DESC, c.CourseCode`,
@@ -465,18 +465,18 @@ app.get("/api/students/:studentId/eligible-sections", async (req, res) => {
         c.CourseCode,
         c.CourseName,
         c.CreditHours,
-        t.TermID,
-        t.TermName,
+        t.SemesterID,
+        t.SemesterName,
         CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName,
         r.RoomNumber,
         r.Building,
         s.Schedule
       FROM Section s
       JOIN Course c ON s.CourseID = c.CourseID
-      JOIN Term t ON s.TermID = t.TermID
+      JOIN Semester t ON s.SemesterID = t.SemesterID
       JOIN Faculty f ON s.InstructorID = f.FacultyID
       LEFT JOIN Room r ON s.RoomID = r.RoomID
-      WHERE t.EndDate >= CURDATE()  -- only current/future terms
+      WHERE t.EndDate >= CURDATE()  -- only current/future Semesters
     `);
 
     // 2. Get student's completed courses (with grade A, B, C)
