@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const routes = require("./routes");
 require("dotenv").config();
 
 const app = express();
@@ -10,23 +11,7 @@ const allowedOrigins = [
 ];
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
-
-// Create MySQL connection pool
-const db = mysql
-  .createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    ssl: {
-      rejectUnauthorized: true, // TiDB Cloud requires SSL [citation:3]
-    },
-  })
-  .promise();
+app.use("/api", routes);
 
 // Test route
 app.get("/api/test", (req, res) => {
@@ -93,59 +78,6 @@ app.post("/api/enroll/check-prerequisites", async (req, res) => {
   }
 });
 
-// Get all students (using async/await)
-app.get("/api/students", async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM Student");
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Get student by ID
-app.get("/api/students/:id", async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM Student WHERE StudentID = ?", [
-      req.params.id,
-    ]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: "Student not found" });
-    }
-    res.json(rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Add new student
-app.post("/api/students", async (req, res) => {
-  try {
-    const { FirstName, LastName, Email, EnrollmentDate, MajorID, AdvisorID } =
-      req.body;
-    const [result] = await db.query(
-      `INSERT INTO Student (FirstName, LastName, Email, EnrollmentDate, MajorID, AdvisorID, GPA)
-       VALUES (?, ?, ?, ?, ?, ?, 0.00)`,
-      [
-        FirstName,
-        LastName,
-        Email,
-        EnrollmentDate,
-        MajorID || null,
-        AdvisorID || null,
-      ],
-    );
-    res.status(201).json({ StudentID: result.insertId, ...req.body });
-  } catch (err) {
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({ error: "Email already exists" });
-    }
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
 // Get all courses
 app.get("/api/courses", async (req, res) => {
   try {
