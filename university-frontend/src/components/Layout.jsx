@@ -82,6 +82,34 @@ const Layout = () => {
           >
             Analytics
           </NavLink>
+
+          <div className="mt-4">
+            <p className="text-xs uppercase text-gray-400 font-semibold">
+              Research & Solutions
+            </p>
+            <NavLink
+              to="/demo/silos"
+              className={({ isActive }) =>
+                `block px-4 py-2 rounded transition ${
+                  isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+                }`
+              }
+            >
+              Data Silos
+            </NavLink>
+
+            <NavLink
+              to="/demo/performance"
+              className={({ isActive }) =>
+                `block px-4 py-2 rounded transition ${
+                  isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+                }`
+              }
+            >
+              Query Performance
+            </NavLink>
+            {/* Add other demo links later */}
+          </div>
         </nav>
       </aside>
 

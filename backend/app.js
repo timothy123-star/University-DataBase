@@ -9,6 +9,7 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 const programRoutes = require("./routes/programRoutes");
 const facultyRoutes = require("./routes/facultyRoutes");
 const sectionRoutes = require("./routes/sectionRoutes");
+const performanceRoutes = require("./routes/performanceRoutes");
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -29,5 +30,6 @@ app.use("/api/v1/courses", courseRoutes);
 // app.use("/api/v1/programs", programRoutes);
 // app.use("/api/v1/faculty", facultyRoutes);
 app.use("/api/v1/sections", sectionRoutes);
+app.use("/api/v1/demo", performanceRoutes);
 
 module.exports = app;

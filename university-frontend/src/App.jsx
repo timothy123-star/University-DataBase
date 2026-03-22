@@ -6,6 +6,8 @@ import EnhancedEnrollment from "./components/EnhancedEnrollment";
 import StudentProfile from "./components/StudentProfile";
 import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import StudentRegistration from "./components/StudentRegistration";
+import DataSilosDemo from "./components/DataSilosDemo";
+import PerformanceDemo from "./components/PerformanceDemo";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           <Route path="enroll-enhanced" element={<EnhancedEnrollment />} />
           <Route path="analytics" element={<AnalyticsDashboard />} />
           <Route path="register" element={<StudentRegistration />} />
+          <Route path="/demo/silos" element={<DataSilosDemo />} />
+          <Route path="/demo/performance" element={<PerformanceDemo />} />
         </Route>
       </Routes>
     </BrowserRouter>

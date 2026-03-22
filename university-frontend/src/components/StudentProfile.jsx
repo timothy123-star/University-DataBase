@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // if using react-router
 import { getStudentProfile } from "../services/api"; // we'll add this function
 
-const StudentProfile = () => {
-  const { id } = useParams(); // gets student ID from URL, e.g., /students/1
+const StudentProfile = ({ studentId: propStudentId }) => {
+  const { id: urlStudentid } = useParams(); // gets student ID from URL, e.g., /students/1
+  const id = propStudentId || urlStudentid;
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
