@@ -1,3 +1,5 @@
+const db = require("../config/db");
+
 // ==================== COURSES ====================
 // Get all courses
 exports.getAllCourses = async (req, res) => {
