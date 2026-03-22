@@ -1,12 +1,9 @@
 const db = require("../config/db");
 
-// ==================== PROGRAMS ====================
-
-// Get all programs
-app.get("/api/programs", async (req, res) => {
+exports.getAllPrograms = async (req, res) => {
   try {
     const [rows] = await db.query(`
-      SELECT p.*, d.DepartmentName
+      SELECT p.ProgramID, p.ProgramName, p.ProgramCode, d.DepartmentID, d.DepartmentName
       FROM Program p
       JOIN Department d ON p.DepartmentID = d.DepartmentID
     `);
@@ -15,4 +12,4 @@ app.get("/api/programs", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
+};

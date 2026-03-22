@@ -9,6 +9,7 @@ import StudentRegistration from "./components/StudentRegistration";
 import DataSilosDemo from "./components/DataSilosDemo";
 import PerformanceDemo from "./components/PerformanceDemo";
 import LackOfAnalyticsDemo from "./components/LackOfAnalyticsDemo";
+import DataQualityDemo from "./components/DataQualityDemo";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/demo/silos" element={<DataSilosDemo />} />
           <Route path="/demo/performance" element={<PerformanceDemo />} />
           <Route path="/demo/analytics" element={<LackOfAnalyticsDemo />} />
+          <Route path="/demo/data-quality" element={<DataQualityDemo />} />
         </Route>
       </Routes>
     </BrowserRouter>

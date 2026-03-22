@@ -24,11 +24,11 @@ app.get("/api/v1/test", (req, res) => {
 });
 
 app.use("/api/v1/students", studentRoutes);
-// app.use("/api/v1/enroll", enrollmentRoutes);
+app.use("/api/v1/enroll", enrollmentRoutes);
 app.use("/api/v1/courses", courseRoutes);
 app.use("/api/v1/analytics", analyticsRoutes);
-// app.use("/api/v1/programs", programRoutes);
-// app.use("/api/v1/faculty", facultyRoutes);
+app.use("/api/v1/programs", programRoutes);
+app.use("/api/v1/faculty", facultyRoutes);
 app.use("/api/v1/sections", sectionRoutes);
 app.use("/api/v1/demo", performanceRoutes);
 

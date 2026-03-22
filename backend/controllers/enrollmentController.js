@@ -67,31 +67,3 @@ app.post("/api/enroll", async (req, res) => {
 });
 
 // ==================== ENROLLMENTS ====================
-
-// Get all enrollments for a student
-app.get("/api/students/:studentId/enrollments", async (req, res) => {
-  try {
-    const { studentId } = req.params;
-    const [rows] = await db.query(
-      `
-      SELECT e.*, 
-             s.SectionNumber,
-             c.CourseCode, c.CourseName,
-             t.SemesterName,
-             CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName
-      FROM Enrollment e
-      JOIN Section sec ON e.SectionID = sec.SectionID
-      JOIN Course c ON sec.CourseID = c.CourseID
-      JOIN Semester t ON sec.SemesterID = t.SemesterID
-      JOIN Faculty f ON sec.InstructorID = f.FacultyID
-      WHERE e.StudentID = ?
-      ORDER BY t.StartDate DESC
-    `,
-      [studentId],
-    );
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});

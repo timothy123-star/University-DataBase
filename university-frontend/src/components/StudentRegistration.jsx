@@ -2,67 +2,89 @@ import React, { useState, useEffect } from "react";
 import { getPrograms, getFaculty, registerStudent } from "../services/api";
 
 const StudentRegistration = () => {
-  // Form state
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    enrollmentDate: new Date().toISOString().split("T")[0], // today's date
-    majorId: "",
+    enrollmentDate: new Date().toISOString().split("T")[0],
+    ProgramID: "",
     advisorId: "",
   });
 
-  // Dropdown data
   const [programs, setPrograms] = useState([]);
-  const [faculty, setFaculty] = useState([]);
+  const [allFaculty, setAllFaculty] = useState([]); // all faculty from API
+  const [filteredFaculty, setFilteredFaculty] = useState([]); // filtered by program's department
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [errors, setErrors] = useState({});
 
-  // Fetch dropdown options on mount
+  // Fetch programs and faculty on mount
   useEffect(() => {
     Promise.all([getPrograms(), getFaculty()])
       .then(([programsRes, facultyRes]) => {
         setPrograms(programsRes.data);
-        setFaculty(facultyRes.data);
+        setAllFaculty(facultyRes.data);
+        setFilteredFaculty(facultyRes.data); // initially show all (no program selected)
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
+        setMessage({
+          type: "error",
+          text: "Failed to load data. Please refresh the page.",
+        });
         setLoading(false);
       });
   }, []);
 
-  // Handle input changes
+  // When program changes, filter advisors to those in the same department
+  useEffect(() => {
+    if (!formData.ProgramID) {
+      setFilteredFaculty(allFaculty);
+      // Also clear advisor selection if no program
+      setFormData((prev) => ({ ...prev, advisorId: "" }));
+      return;
+    }
+
+    // Find selected program to get its DepartmentID
+    const selectedProgram = programs.find(
+      (p) => p.ProgramID === parseInt(formData.ProgramID),
+    );
+    if (selectedProgram && selectedProgram.DepartmentID) {
+      const filtered = allFaculty.filter(
+        (f) => f.DepartmentID === selectedProgram.DepartmentID,
+      );
+      setFilteredFaculty(filtered);
+    } else {
+      setFilteredFaculty(allFaculty);
+    }
+    // Reset advisor selection when program changes
+    setFormData((prev) => ({ ...prev, advisorId: "" }));
+  }, [formData.ProgramID, programs, allFaculty]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear field-specific error when user types
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // Validate form
   const validate = () => {
     const newErrors = {};
     if (!formData.firstName.trim())
       newErrors.firstName = "First name is required";
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = "Email is invalid";
-    }
     if (!formData.enrollmentDate)
       newErrors.enrollmentDate = "Enrollment date is required";
-    // Major and Advisor are optional, so no validation
+    if (!formData.ProgramID) newErrors.ProgramID = "Please select a major";
+    // Advisor is optional, no validation
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -76,7 +98,7 @@ const StudentRegistration = () => {
         LastName: formData.lastName,
         Email: formData.email,
         EnrollmentDate: formData.enrollmentDate,
-        MajorID: formData.majorId || null,
+        ProgramID: formData.ProgramID,
         AdvisorID: formData.advisorId || null,
       });
 
@@ -85,15 +107,17 @@ const StudentRegistration = () => {
         text: `Student registered successfully! ID: ${response.data.StudentID}`,
       });
 
-      // Optionally reset form
+      // Reset form
       setFormData({
         firstName: "",
         lastName: "",
         email: "",
         enrollmentDate: new Date().toISOString().split("T")[0],
-        majorId: "",
+        ProgramID: "",
         advisorId: "",
       });
+      // Reset filtered faculty to all (since program cleared)
+      setFilteredFaculty(allFaculty);
     } catch (err) {
       const errorMsg = err.response?.data?.error || "Registration failed";
       setMessage({ type: "error", text: errorMsg });
@@ -200,16 +224,18 @@ const StudentRegistration = () => {
             )}
           </div>
 
-          {/* Major (Program) Dropdown */}
+          {/* Program (Major) Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Major (optional)
+              Major *
             </label>
             <select
-              name="majorId"
-              value={formData.majorId}
+              name="ProgramID"
+              value={formData.ProgramID}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                errors.ProgramID ? "border-red-500" : "border-gray-300"
+              }`}
             >
               <option value="">-- Select a major --</option>
               {programs.map((prog) => (
@@ -218,9 +244,12 @@ const StudentRegistration = () => {
                 </option>
               ))}
             </select>
+            {errors.ProgramID && (
+              <p className="text-red-500 text-xs mt-1">{errors.ProgramID}</p>
+            )}
           </div>
 
-          {/* Advisor Dropdown */}
+          {/* Advisor Dropdown – Filtered by program's department */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Advisor (optional)
@@ -230,14 +259,20 @@ const StudentRegistration = () => {
               value={formData.advisorId}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!formData.ProgramID}
             >
               <option value="">-- Select an advisor --</option>
-              {faculty.map((f) => (
+              {filteredFaculty.map((f) => (
                 <option key={f.FacultyID} value={f.FacultyID}>
                   {f.FirstName} {f.LastName} ({f.DepartmentName})
                 </option>
               ))}
             </select>
+            {!formData.ProgramID && (
+              <p className="text-gray-500 text-xs mt-1">
+                Select a major first to see advisors.
+              </p>
+            )}
           </div>
 
           {/* Message Display */}

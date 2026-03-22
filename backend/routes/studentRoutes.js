@@ -9,6 +9,8 @@ router.get(
   "/:studentId/eligible-sections",
   studentController.getStudentEligibleSections,
 );
+router.get("/:id/enrollments", studentController.getStudentEnrollments);
+
 router.post("/", studentController.createStudent);
 
 module.exports = router;

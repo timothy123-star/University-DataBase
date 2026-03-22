@@ -27,4 +27,9 @@ export const getPrograms = () => API.get("/programs");
 export const getFaculty = () => API.get("/faculty");
 export const registerStudent = (data) => API.post("/students", data);
 
+export const getStudentEnrollments = (studentId) =>
+  API.get(`/students/${studentId}/enrollments`);
+export const updateGrade = (enrollmentId, grade) =>
+  API.put(`/enroll/${enrollmentId}/grade`, { grade });
+
 export default API;

@@ -1,12 +1,9 @@
 const db = require("../config/db");
 
-// ==================== FACULTY ====================
-
-// Get all faculty
-app.get("/api/faculty", async (req, res) => {
+exports.getAllFaculty = async (req, res) => {
   try {
     const [rows] = await db.query(`
-      SELECT f.*, d.DepartmentName
+      SELECT f.FacultyID, f.FirstName, f.LastName, f.Email, d.DepartmentID, d.DepartmentName
       FROM Faculty f
       JOIN Department d ON f.DepartmentID = d.DepartmentID
     `);
@@ -15,4 +12,4 @@ app.get("/api/faculty", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
+};
