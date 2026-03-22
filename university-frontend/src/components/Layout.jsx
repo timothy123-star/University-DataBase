@@ -94,6 +94,7 @@ const Layout = () => {
                   isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
                 }`
               }
+              onClick={() => setSidebarOpen(false)}
             >
               Data Silos
             </NavLink>
@@ -105,6 +106,7 @@ const Layout = () => {
                   isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
                 }`
               }
+              onClick={() => setSidebarOpen(false)}
             >
               Query Performance
             </NavLink>
@@ -115,6 +117,7 @@ const Layout = () => {
                   isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
                 }`
               }
+              onClick={() => setSidebarOpen(false)}
             >
               Lack of Analytics
             </NavLink>
@@ -125,6 +128,7 @@ const Layout = () => {
                   isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
                 }`
               }
+              onClick={() => setSidebarOpen(false)}
             >
               Data Quality
             </NavLink>
