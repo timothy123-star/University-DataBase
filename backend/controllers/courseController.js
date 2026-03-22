@@ -1,6 +1,6 @@
 // ==================== COURSES ====================
 // Get all courses
-app.get("/api/courses", async (req, res) => {
+exports.getAllCourses = async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM Course");
     res.json(rows);
@@ -8,10 +8,10 @@ app.get("/api/courses", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
+};
 
 // Get a single course by ID
-app.get("/api/courses/:id", async (req, res) => {
+exports.getCourseById = async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query(
@@ -29,4 +29,33 @@ app.get("/api/courses/:id", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
+};
+
+// Get sections for a specific course in a Semester
+exports.getCourseSections = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { SemesterId } = req.query; // optional Semester filter
+    let query = `
+      SELECT s.*, 
+             t.SemesterName,
+             CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName,
+             r.RoomNumber, r.Building
+      FROM Section s
+      JOIN Semester t ON s.SemesterID = t.SemesterID
+      JOIN Faculty f ON s.InstructorID = f.FacultyID
+      LEFT JOIN Room r ON s.RoomID = r.RoomID
+      WHERE s.CourseID = ?
+    `;
+    const params = [courseId];
+    if (SemesterId) {
+      query += " AND s.SemesterID = ?";
+      params.push(SemesterId);
+    }
+    const [rows] = await db.query(query, params);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
