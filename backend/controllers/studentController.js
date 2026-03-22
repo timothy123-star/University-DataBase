@@ -61,3 +61,51 @@ exports.createStudent = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// GET /api/students/:id/profile - returns student details + enrollments
+exports.getStudentProfile = async (req, res) => {
+  try {
+    const studentId = req.params.id;
+
+    // 1. Get student personal info
+    const [studentRows] = await db.query(
+      "SELECT StudentID, FirstName, LastName, Email, GPA FROM Student WHERE StudentID = ?",
+      [studentId],
+    );
+    if (studentRows.length === 0) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+    const student = studentRows[0];
+
+    // 2. Get enrollments with course and section details
+    const [enrollments] = await db.query(
+      `SELECT 
+         e.EnrollmentID,
+         e.Grade,
+         e.EnrollmentStatus,
+         c.CourseCode,
+         c.CourseName,
+         c.CreditHours,
+         s.SectionNumber,
+         t.SemesterName,
+         CONCAT(f.FirstName, ' ', f.LastName) AS InstructorName
+       FROM Enrollment e
+       JOIN Section s ON e.SectionID = s.SectionID
+       JOIN Course c ON s.CourseID = c.CourseID
+       JOIN Semester t ON s.SemesterID = t.SemesterID
+       JOIN Faculty f ON s.InstructorID = f.FacultyID
+       WHERE e.StudentID = ?
+       ORDER BY t.StartDate DESC, c.CourseCode`,
+      [studentId],
+    );
+
+    // 3. Combine and send
+    res.json({
+      student,
+      enrollments,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
