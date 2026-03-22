@@ -108,6 +108,16 @@ const Layout = () => {
             >
               Query Performance
             </NavLink>
+            <NavLink
+              to="/demo/analytics"
+              className={({ isActive }) =>
+                `block px-4 py-2 rounded transition ${
+                  isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+                }`
+              }
+            >
+              Lack of Analytics
+            </NavLink>
             {/* Add other demo links later */}
           </div>
         </nav>

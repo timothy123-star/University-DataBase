@@ -9,3 +9,5 @@ router.get(
   "/program-enrollment",
   analyticController.analyticsProgramEnrollment,
 );
+
+module.exports = router;
