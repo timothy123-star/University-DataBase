@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const generateMatricNo = require("../utils/generateMatricNo");
+const enrollLowerCourses = require("../utils/enrollLowerCourses");
 
 exports.getAllStudents = async (req, res) => {
   try {
@@ -49,6 +50,22 @@ exports.createStudent = async (req, res) => {
         AdvisorID || null,
       ],
     );
+
+    const studentId = result.insertId;
+
+    // If the student is in Cyber Security (DepartmentID = 20), auto‑enroll in lower courses
+    // We need to check the Program's DepartmentID.
+    const [[{ DepartmentID }]] = await db.query(
+      `SELECT d.DepartmentID
+       FROM Program p
+       JOIN Department d ON p.DepartmentID = d.DepartmentID
+       WHERE p.ProgramID = ?`,
+      [ProgramID],
+    );
+
+    if (DepartmentID === 20) {
+      await enrollLowerCourses(studentId);
+    }
 
     res.status(201).json({ StudentID: result.insertId, MatricNo });
   } catch (err) {
