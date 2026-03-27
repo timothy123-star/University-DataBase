@@ -11,6 +11,7 @@ import PerformanceDemo from "./components/PerformanceDemo";
 import LackOfAnalyticsDemo from "./components/LackOfAnalyticsDemo";
 import DataQualityDemo from "./components/DataQualityDemo";
 import Tutorials from "./components/Tutorials";
+import SchemaExplorer from "./components/SchemaExplorer";
 
 function App() {
   return (
@@ -22,13 +23,14 @@ function App() {
           <Route path="students/:id" element={<StudentProfile />} />
           <Route path="enroll-enhanced" element={<EnhancedEnrollment />} />
           <Route path="analytics" element={<AnalyticsDashboard />} />
+          <Route path="tutorials" element={<Tutorials />} />
+          <Route path="explorer" element={<SchemaExplorer />} />
           <Route path="register" element={<StudentRegistration />} />
           <Route path="/demo/silos" element={<DataSilosDemo />} />
           <Route path="/demo/performance" element={<PerformanceDemo />} />
           <Route path="/demo/analytics" element={<LackOfAnalyticsDemo />} />
           <Route path="/demo/data-quality" element={<DataQualityDemo />} />
         </Route>
-        <Route path="tutorials" element={<Tutorials />} />
       </Routes>
     </BrowserRouter>
   );

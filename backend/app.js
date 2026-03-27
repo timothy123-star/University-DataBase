@@ -10,6 +10,7 @@ const programRoutes = require("./routes/programRoutes");
 const facultyRoutes = require("./routes/facultyRoutes");
 const sectionRoutes = require("./routes/sectionRoutes");
 const performanceRoutes = require("./routes/performanceRoutes");
+const schemaExplorerRoutes = require("./routes/schemaExplorerRoutes");
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -31,5 +32,6 @@ app.use("/api/v1/programs", programRoutes);
 app.use("/api/v1/faculty", facultyRoutes);
 app.use("/api/v1/sections", sectionRoutes);
 app.use("/api/v1/demo", performanceRoutes);
+app.use("/api/v1/db", schemaExplorerRoutes);
 
 module.exports = app;

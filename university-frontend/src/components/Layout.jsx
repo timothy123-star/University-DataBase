@@ -92,6 +92,16 @@ const Layout = () => {
           >
             Tutorials
           </NavLink>
+          <NavLink
+            to="/explorer"
+            className={({ isActive }) =>
+              `block px-4 py-2 rounded transition ${
+                isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
+              }`
+            }
+          >
+            Database Explorer
+          </NavLink>
 
           <div className="mt-4">
             <p className="text-xs uppercase text-gray-400 font-semibold">
