@@ -11,8 +11,16 @@ const SchemaExplorer = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
+    // Fetch table list
     API.get("/db/tables")
-      .then((res) => setTables(res.data))
+      .then((res) => {
+        const tableNames = res.data;
+        setTables(tableNames);
+        // If Student table exists, automatically select it
+        if (tableNames.includes("Student")) {
+          handleTableClick("Student");
+        }
+      })
       .catch((err) => setError("Failed to load tables"));
   }, []);
 
@@ -32,6 +40,7 @@ const SchemaExplorer = () => {
     }
   };
 
+  // Helper functions (isDateColumn, formatCellValue) remain the same...
   const isDateColumn = (columnName, value) => {
     const dateColumns = ["EnrollmentDate", "StartDate", "EndDate", "HireDate"];
     if (dateColumns.includes(columnName)) return true;
