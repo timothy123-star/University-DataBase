@@ -89,6 +89,7 @@ const Layout = () => {
                 isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
               }`
             }
+            onClick={() => setSidebarOpen(false)}
           >
             Tutorials
           </NavLink>
@@ -99,6 +100,7 @@ const Layout = () => {
                 isActive ? "bg-indigo-600" : "hover:bg-indigo-700"
               }`
             }
+            onClick={() => setSidebarOpen(false)}
           >
             Database Explorer
           </NavLink>

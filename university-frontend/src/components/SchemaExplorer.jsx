@@ -8,9 +8,9 @@ const SchemaExplorer = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // Fetch table list
     API.get("/db/tables")
       .then((res) => setTables(res.data))
       .catch((err) => setError("Failed to load tables"));
@@ -23,6 +23,8 @@ const SchemaExplorer = () => {
       const res = await API.get(`/db/table/${tableName}`);
       setTableData(res.data);
       setSelectedTable(tableName);
+      // Close sidebar on mobile after selection (optional)
+      if (window.innerWidth < 768) setSidebarOpen(false);
     } catch (err) {
       setError(err.response?.data?.error || "Failed to load table data");
     } finally {
@@ -30,18 +32,14 @@ const SchemaExplorer = () => {
     }
   };
 
-  // Helper to check if a column contains date data
   const isDateColumn = (columnName, value) => {
-    // Check by column name
     const dateColumns = ["EnrollmentDate", "StartDate", "EndDate", "HireDate"];
     if (dateColumns.includes(columnName)) return true;
-    // Fallback: if value looks like a date string (ISO format) and not null
     if (value && typeof value === "string" && value.match(/^\d{4}-\d{2}-\d{2}/))
       return true;
     return false;
   };
 
-  // Helper to format a cell value
   const formatCellValue = (key, value) => {
     if (value === null) return "NULL";
     if (isDateColumn(key, value)) {
@@ -51,34 +49,76 @@ const SchemaExplorer = () => {
   };
 
   return (
-    <div className="flex h-full">
-      {/* Sidebar with table list */}
-      <div className="w-64 bg-gray-100 border-r p-4 overflow-y-auto">
-        <h2 className="text-lg font-bold mb-3">Tables</h2>
-        <ul>
-          {tables.map((table) => (
-            <li key={table}>
-              <button
-                onClick={() => handleTableClick(table)}
-                className={`block w-full text-left px-2 py-1 rounded hover:bg-gray-200 ${
-                  selectedTable === table
-                    ? "bg-indigo-100 text-indigo-800 font-medium"
-                    : ""
-                }`}
-              >
-                {table}
-              </button>
-            </li>
-          ))}
-        </ul>
+    <div className="relative flex h-full">
+      {/* Sidebar (hidden by default on mobile, toggled) */}
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-30 w-64 bg-gray-100 border-r transform transition-transform duration-300
+          md:relative md:translate-x-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        <div className="p-4">
+          <h2 className="text-lg font-bold mb-3">Tables</h2>
+          <ul>
+            {tables.map((table) => (
+              <li key={table}>
+                <button
+                  onClick={() => handleTableClick(table)}
+                  className={`block w-full text-left px-2 py-1 rounded hover:bg-gray-200 ${
+                    selectedTable === table
+                      ? "bg-indigo-100 text-indigo-800 font-medium"
+                      : ""
+                  }`}
+                >
+                  {table}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      {/* Right side: Table data */}
-      <div className="flex-1 p-4 overflow-auto">
+
+      {/* Overlay when sidebar is open on mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main content */}
+      <div className="flex-1 overflow-auto p-4">
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 bg-gray-100 rounded-md md:hidden focus:outline-none"
+            aria-label="Toggle sidebar"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+          {selectedTable && (
+            <h2 className="text-xl font-bold">{selectedTable}</h2>
+          )}
+          <div className="w-8 md:hidden" /> {/* spacer for alignment */}
+        </div>
+
         {loading && <p>Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {selectedTable && !loading && !error && (
-          <div>
-            <h2 className="text-2xl font-bold mb-4">{selectedTable}</h2>
+          <>
             {tableData.length === 0 ? (
               <p>No data in this table.</p>
             ) : (
@@ -107,9 +147,9 @@ const SchemaExplorer = () => {
                 </table>
               </div>
             )}
-          </div>
+          </>
         )}
-      </div>{" "}
+      </div>
     </div>
   );
 };
