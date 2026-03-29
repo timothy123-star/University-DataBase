@@ -5,7 +5,7 @@ const tutorials = [
     id: 1,
     title: "Introduction to Databases & DBMS",
     description: "What is a database? Why DBMS? Overview of relational model.",
-    embedUrl: "https://www.youtube.com/embed/3mQcyyD2_uU", // Replace with your video URL
+    embedUrl: "https://www.youtube.com/embed/n9rlemk6ODM", // Replace with your video URL
   },
   {
     id: 2,
