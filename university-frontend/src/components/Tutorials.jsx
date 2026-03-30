@@ -12,7 +12,7 @@ const tutorials = [
     title: "Designing the University Database Schema",
     description:
       "ER diagram, tables, keys, and relationships in our enhanced model.",
-    embedUrl: "https://www.youtube.com/embed/VIDEO_ID_2",
+    embedUrl: "https://www.youtube.com/embed/3mzf5VQxvhA?si=OG5ggKjI7lReZ7li",
   },
   {
     id: 3,
@@ -80,3 +80,4 @@ const Tutorials = () => {
 };
 
 export default Tutorials;
+
